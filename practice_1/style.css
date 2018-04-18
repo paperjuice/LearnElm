@@ -1,0 +1,34 @@
+:root {
+  --background_color: #494368;
+  --text_color: #F4b393;
+  --star_url: 'http://img-cache.cdn.gaiaonline.com/76bd5c99d8f2236e9d3672510e933fdf/http://i278.photobucket.com/albums/kk81/d3m3nt3dpr3p/Tiny-Star-Icon.png';
+}
+
+body {
+  background-color: var(--background_color);
+}
+
+h1 {
+  color: #F4B393;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.tagline {
+  text-align: center;
+  color: var(--text_color);
+}
+
+ul {
+  color: var(--text_color);
+  list-style-image: var(--star_url);
+  list-style-position: inside;
+  font-size: 22px;
+}
+
+a {
+  text-decoration: none;
+  font-style: italic;
+  color: var(--text_color);
+  margin-left: 10px;
+}

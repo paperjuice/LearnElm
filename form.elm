@@ -31,6 +31,7 @@ type Msg
   | Password String
   | RepeatPassword String
   | Age String
+  | Submit
 
 -- UPDATE
 
@@ -49,7 +50,11 @@ update msg model =
     Age age ->
       { model | age = age }
 
+    Submit ->
+      model
+
 -- VIEW
+
 
 view : Model -> Html Msg
 view model =
@@ -58,11 +63,10 @@ view model =
   , input [type_ "password", placeholder "Password", onInput Password] []
   , input [type_ "password", placeholder "Password again", onInput RepeatPassword] []
   , input [type_ "text", placeholder "Insert age", onInput Age] []
-  -- TODO: baga un submit button
-  , validatePasswordMatch model
-  , validatePasswordLength model
-  , validateAge model
+  , button [ onClick Submit ] [ text "Submit" ]
   ]
+
+
 
 validatePasswordLength : Model -> Html msg
 validatePasswordLength model =
@@ -75,7 +79,7 @@ validatePasswordLength model =
   in
     div [ style [ ("color", code) ] ] [ text message ]
 
-validatePasswordMatch : Model -> Html Msg
+validatePasswordMatch : Model -> Html msg
 validatePasswordMatch model =
   let
     (color, message) =
@@ -86,7 +90,7 @@ validatePasswordMatch model =
   in
     div [ style [ ("color", color)] ] [ text message]
 
-validateAge : Model -> Html Msg
+validateAge : Model -> Html msg
 validateAge model =
   let
     (color, message) =
