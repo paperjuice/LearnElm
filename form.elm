@@ -9,10 +9,16 @@ main =
   , update = update
   }
 
+
+type StatusOptions
+  = Correct
+  | Incorrect
+  | Undefined
+
 type alias Status =
-  { isMatch : Bool
-  , isTooLong : Bool
-  , isAgeNumber : Bool
+  { isMatch : StatusOptions
+  , isGoodLength: StatusOptions
+  , isAgeNumber : StatusOptions
   }
 
 -- MODEL
@@ -31,9 +37,9 @@ model =
   , rPassword = ""
   , age = ""
   , status =
-    { isMatch = True
-    , isTooLong = True
-    , isAgeNumber = True
+    { isMatch = Undefined
+    , isGoodLength = Undefined
+    , isAgeNumber = Undefined
     }
   }
 
@@ -62,28 +68,35 @@ update msg model =
       { model | age = age }
 
     Submit  ->
-      { model | status.isMatch = isMatchFunc model
-              , status.isTooLong = isTooLongFunc model
-              , status.isAgeNumber = isAgeNumberFunc model
-              }
+      let
+          oldStatus = model.status
+          newStatus =
+            { oldStatus | isMatch = isMatch model
+                        , isGoodLength = isGoodLength model
+                        , isAgeNumber = isAgeNumber model
+                        }
+      in
+          { model | status = newStatus }
 
-isMatchFunc : Model -> Bool
-isMatchFunc model =
+
+
+isMatch : Model -> StatusOptions
+isMatch model =
   case model.password == model.rPassword of
-    True -> True
-    False -> False
+    True  -> Correct
+    False -> Incorrect
 
-isTooLongFunc : Model -> Bool
-isTooLongFunc model =
-  case (model.password |> String.length) > 8 of
-    True -> True
-    False -> False
+isGoodLength : Model -> StatusOptions
+isGoodLength model =
+  case (model.password |> String.length) < 8 of
+    True  -> Correct
+    False -> Incorrect
 
-isAgeNumberFunc : Model -> Bool
-isAgeNumberFunc model =
-  case model.age |> String.toInt of
-    Ok _msg  -> True
-    Err _msg -> False
+isAgeNumber : Model -> StatusOptions
+isAgeNumber model =
+  case (model.age |> String.toInt) of
+    Ok  msg -> Correct
+    Err msg -> Incorrect
 
 
 -- VIEW
@@ -96,5 +109,29 @@ view model =
   , input [type_ "password", placeholder "Password again", onInput RepeatPassword] []
   , input [type_ "text", placeholder "Insert age", onInput Age] []
   , button [ onClick Submit ] [ text "Submit" ]
+  , showPasswordMatchValidation model
+  , showPasswordLengthValidation model
+  , showAgeValidation model
   ]
+
+showPasswordMatchValidation : Model -> Html msg
+showPasswordMatchValidation model =
+  case model.status.isMatch of
+   Correct   -> div [ style [ ("color", "Green") ] ] [ text "Passwords match." ]
+   Incorrect -> div [ style [ ("color", "Red") ] ] [ text "Passwords need to match!" ]
+   Undefined -> div [] []
+
+showPasswordLengthValidation : Model -> Html msg
+showPasswordLengthValidation model =
+  case model.status.isGoodLength of
+   Correct   -> div [ style [ ("color", "Green") ] ] [ text "Password is short and sweet." ]
+   Incorrect -> div [ style [ ("color", "Red") ] ] [ text "Passwords is too long." ]
+   Undefined -> div [] []
+
+showAgeValidation : Model -> Html msg
+showAgeValidation model =
+  case model.status.isAgeNumber of
+   Correct   -> div [ style [ ("color", "Green") ] ] [ text "Age is fine." ]
+   Incorrect -> div [ style [ ("color", "Red") ] ] [ text "Age needs to be a number." ]
+   Undefined -> div [] []
 
