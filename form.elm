@@ -9,6 +9,11 @@ main =
   , update = update
   }
 
+type alias Status =
+  { isMatch : Bool
+  , isTooLong : Bool
+  , isAgeNumber : Bool
+  }
 
 -- MODEL
 type alias Model =
@@ -16,6 +21,7 @@ type alias Model =
   , password : String
   , rPassword : String
   , age : String
+  , status : Status
   }
 
 model : Model
@@ -24,6 +30,11 @@ model =
   , password = ""
   , rPassword = ""
   , age = ""
+  , status =
+    { isMatch = True
+    , isTooLong = True
+    , isAgeNumber = True
+    }
   }
 
 type Msg
@@ -50,11 +61,32 @@ update msg model =
     Age age ->
       { model | age = age }
 
-    Submit ->
-      model
+    Submit  ->
+      { model | status.isMatch = isMatchFunc model
+              , status.isTooLong = isTooLongFunc model
+              , status.isAgeNumber = isAgeNumberFunc model
+              }
+
+isMatchFunc : Model -> Bool
+isMatchFunc model =
+  case model.password == model.rPassword of
+    True -> True
+    False -> False
+
+isTooLongFunc : Model -> Bool
+isTooLongFunc model =
+  case (model.password |> String.length) > 8 of
+    True -> True
+    False -> False
+
+isAgeNumberFunc : Model -> Bool
+isAgeNumberFunc model =
+  case model.age |> String.toInt of
+    Ok _msg  -> True
+    Err _msg -> False
+
 
 -- VIEW
-
 
 view : Model -> Html Msg
 view model =
@@ -66,39 +98,3 @@ view model =
   , button [ onClick Submit ] [ text "Submit" ]
   ]
 
-
-
-validatePasswordLength : Model -> Html msg
-validatePasswordLength model =
-  let
-    (code, message) =
-      if String.length(model.password) > 8 then
-        ("Red", "Password too long")
-      else
-        ("Green", "Password is fine")
-  in
-    div [ style [ ("color", code) ] ] [ text message ]
-
-validatePasswordMatch : Model -> Html msg
-validatePasswordMatch model =
-  let
-    (color, message) =
-      if model.password == model.rPassword then
-        ("Green", "All good")
-      else
-        ("Red", "Passwords must match!")
-  in
-    div [ style [ ("color", color)] ] [ text message]
-
-validateAge : Model -> Html msg
-validateAge model =
-  let
-    (color, message) =
-      case (model.age |> String.toInt) of
-        Ok message ->
-          ("Green", "Age is fine")
-
-        Err message ->
-          ("Red", "Age needs to be a number")
-  in
-    div [ style [("color", color)] ] [ text message]

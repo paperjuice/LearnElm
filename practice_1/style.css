@@ -32,3 +32,12 @@ a {
   color: var(--text_color);
   margin-left: 10px;
 }
+
+button {
+  margin-left: 20px;
+  transition: 1s;
+}
+button:hover {
+  background-color: green;
+  border-radius: 6px;
+}
