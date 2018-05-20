@@ -38,6 +38,6 @@ button {
   transition: 1s;
 }
 button:hover {
-  background-color: green;
+  background-color: white;
   border-radius: 6px;
 }
